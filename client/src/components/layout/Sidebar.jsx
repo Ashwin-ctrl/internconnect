@@ -1,10 +1,12 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../../features/auth/authSlice';
+import { useState, useEffect } from 'react';
+import api from '../../utils/api';
 import {
   LayoutDashboard, User, Search, FileText, ClipboardList,
   MessageSquare, Award, Building2, Users, Settings,
-  ChevronRight, LogOut, Bell
+  ChevronRight, LogOut, Bell, ShieldCheck,
 } from 'lucide-react';
 
 const studentNav = [
@@ -28,6 +30,7 @@ const companyNav = [
 const adminNav = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/users', icon: Users, label: 'Users' },
+  { to: '/admin/verifications', icon: ShieldCheck, label: 'Verifications', badge: true },
   { to: '/admin/internships', icon: Building2, label: 'Internships' },
   { to: '/admin/discussions', icon: MessageSquare, label: 'Forum' },
   { to: '/admin/reports', icon: FileText, label: 'Reports' },
@@ -38,6 +41,16 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  // Fetch pending verification count for admin
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      api.get('/admin/verifications?status=pending')
+        .then(r => setPendingCount(r.data.pendingCount || 0))
+        .catch(() => {});
+    }
+  }, [user, location.pathname]);
 
   const navItems = user?.role === 'student' ? studentNav
     : user?.role === 'company' ? companyNav : adminNav;
@@ -81,14 +94,20 @@ const Sidebar = () => {
 
       {}
       <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ to, icon: Icon, label }) => {
+        {navItems.map(({ to, icon: Icon, label, badge }) => {
           const active = location.pathname === to;
+          const showBadge = badge && pendingCount > 0;
           return (
             <Link key={to} to={to}
               className={active ? 'sidebar-item-active' : 'sidebar-item'}>
               <Icon size={18} className={active ? 'text-primary-400' : ''} />
-              <span className="text-sm">{label}</span>
-              {active && <ChevronRight size={14} className="ml-auto text-primary-400" />}
+              <span className="text-sm flex-1">{label}</span>
+              {showBadge && (
+                <span className="ml-auto min-w-[20px] h-5 px-1 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold animate-pulse">
+                  {pendingCount > 9 ? '9+' : pendingCount}
+                </span>
+              )}
+              {active && !showBadge && <ChevronRight size={14} className="ml-auto text-primary-400" />}
             </Link>
           );
         })}

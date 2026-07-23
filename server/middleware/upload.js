@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 
-const dirs = ['uploads/resumes', 'uploads/assignments', 'uploads/avatars', 'uploads/logos', 'uploads/certificates'];
+const dirs = ['uploads/resumes', 'uploads/assignments', 'uploads/avatars', 'uploads/logos', 'uploads/certificates', 'uploads/verification'];
 dirs.forEach(dir => {
   const fullPath = path.join(__dirname, '..', dir);
   if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
@@ -50,4 +50,10 @@ const uploadLogo = multer({
   fileFilter: fileFilter(['.jpg', '.jpeg', '.png', '.webp', '.svg']),
 });
 
-module.exports = { uploadResume, uploadAssignment, uploadAvatar, uploadLogo };
+const uploadVerificationDocs = multer({
+  storage: createStorage('verification'),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: fileFilter(['.pdf', '.jpg', '.jpeg', '.png']),
+});
+
+module.exports = { uploadResume, uploadAssignment, uploadAvatar, uploadLogo, uploadVerificationDocs };

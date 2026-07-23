@@ -138,4 +138,62 @@ const getAllCertificates = async (req, res) => {
   }
 };
 
-module.exports = { getStats, getUsers, toggleUser, getAllInternships, updateInternshipStatus, deleteDiscussion, getAllCertificates };
+
+const getPendingVerifications = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const query = { role: { $in: ['student', 'company'] } };
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      query.verificationStatus = status;
+    } else {
+      query.verificationStatus = { $in: ['pending', 'rejected'] };
+    }
+
+    const users = await User.find(query)
+      .select('-password -refreshToken')
+      .sort({ createdAt: -1 });
+
+    const pendingCount = await User.countDocuments({
+      role: { $in: ['student', 'company'] },
+      verificationStatus: 'pending',
+    });
+
+    res.json({ success: true, users, pendingCount });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+const reviewVerification = async (req, res) => {
+  try {
+    const { action, note } = req.body;
+    if (!['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ success: false, message: 'Action must be approve or reject' });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (user.role === 'admin') return res.status(400).json({ success: false, message: 'Cannot review admin account' });
+
+    if (action === 'approve') {
+      user.verificationStatus = 'approved';
+      user.isActive = true;
+      user.verificationNote = '';
+    } else {
+      user.verificationStatus = 'rejected';
+      user.isActive = false;
+      user.verificationNote = note || 'Documents were not acceptable. Please resubmit.';
+    }
+
+    await user.save();
+    res.json({ success: true, user, message: `User ${action === 'approve' ? 'approved' : 'rejected'} successfully` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = {
+  getStats, getUsers, toggleUser, getAllInternships, updateInternshipStatus,
+  deleteDiscussion, getAllCertificates, getPendingVerifications, reviewVerification,
+};

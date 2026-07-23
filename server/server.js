@@ -48,8 +48,11 @@ const seedAdmin = async () => {
         password: 'Admin@123',
         role: 'admin',
         isActive: true,
+        verificationStatus: 'approved',
       });
       console.log('✅ Admin account seeded: admin@internconnect.com / Admin@123');
+    } else if (adminExists.verificationStatus !== 'approved') {
+      await User.updateOne({ role: 'admin' }, { verificationStatus: 'approved' });
     }
   } catch (err) {
     console.error('Seed error:', err.message);
@@ -68,8 +71,11 @@ const seedSampleData = async () => {
         role: 'student',
         college: 'Demo University',
         isActive: true,
+        verificationStatus: 'approved',
       });
       console.log('✅ Demo Student account seeded');
+    } else if (studentExists.verificationStatus !== 'approved') {
+      await User.updateOne({ email: 'student@demo.com' }, { verificationStatus: 'approved' });
     }
 
     const companyExists = await User.findOne({ role: 'company', email: 'techcorp@demo.com' });
@@ -85,6 +91,7 @@ const seedSampleData = async () => {
         website: 'https://techcorp.example.com',
         location: 'Bangalore, India',
         isActive: true,
+        verificationStatus: 'approved',
       });
 
       const Internship = require('./models/Internship');
@@ -162,6 +169,8 @@ const seedSampleData = async () => {
       ];
       await Internship.insertMany(internships);
       console.log('✅ Sample company and 5 internships seeded');
+    } else if (companyExists.verificationStatus !== 'approved') {
+      await User.updateOne({ email: 'techcorp@demo.com' }, { verificationStatus: 'approved' });
     }
   } catch (err) {
     console.error('Sample data seed error:', err.message);

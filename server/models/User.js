@@ -33,6 +33,16 @@ const userSchema = new mongoose.Schema({
 
   isActive: { type: Boolean, default: true },
   refreshToken: { type: String, default: '' },
+
+  // Document verification
+  verificationStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending',
+  },
+  verificationDocuments: [{ type: String }],
+  verificationNote: { type: String, default: '' },
+  verificationResubmission: { type: Boolean, default: false },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

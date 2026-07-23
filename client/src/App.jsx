@@ -33,9 +33,11 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers from './pages/admin/Users';
 import AdminInternships from './pages/admin/Internships';
 import AdminReports from './pages/admin/Reports';
+import AdminVerifications from './pages/admin/Verifications';
 
 
 import VerifyCertificate from './pages/VerifyCertificate';
+import ResubmitDocuments from './pages/ResubmitDocuments';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -79,9 +81,11 @@ const App = () => {
         <Route path="/admin/internships" element={<ProtectedRoute roles={['admin']}><AdminInternships /></ProtectedRoute>} />
         <Route path="/admin/discussions" element={<ProtectedRoute roles={['admin', 'student', 'company']}><StudentDiscussions /></ProtectedRoute>} />
         <Route path="/admin/reports" element={<ProtectedRoute roles={['admin']}><AdminReports /></ProtectedRoute>} />
+        <Route path="/admin/verifications" element={<ProtectedRoute roles={['admin']}><AdminVerifications /></ProtectedRoute>} />
 
         {}
         <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
+        <Route path="/resubmit-documents" element={<ResubmitDocuments />} />
 
         {}
         <Route path="*" element={<Navigate to="/" replace />} />

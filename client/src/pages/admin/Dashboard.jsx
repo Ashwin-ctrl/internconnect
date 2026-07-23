@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import StatCard from '../../components/shared/StatCard';
 import api from '../../utils/api';
-import { Users, Building2, Briefcase, FileText, Activity } from 'lucide-react';
+import { Users, Building2, Briefcase, FileText, Activity, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
 
@@ -11,9 +12,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pendingVerifications, setPendingVerifications] = useState(0);
 
   useEffect(() => {
     api.get('/admin/stats').then(r => { setStats(r.data.stats); setLoading(false); }).catch(() => setLoading(false));
+    api.get('/admin/verifications?status=pending').then(r => setPendingVerifications(r.data.pendingCount || 0)).catch(() => {});
   }, []);
 
   if (loading) return <DashboardLayout title="Admin Dashboard"><div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" /></div></DashboardLayout>;
@@ -48,12 +51,35 @@ const AdminDashboard = () => {
 
   return (
     <DashboardLayout title="Platform Analytics" subtitle="Overview of InternConnect activity">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
         <StatCard icon={Users} label="Total Students" value={stats?.totalStudents} color="primary" sub={`${stats?.activeStudents} active`} />
         <StatCard icon={Building2} label="Companies" value={stats?.totalCompanies} color="blue" />
         <StatCard icon={Briefcase} label="Internships" value={stats?.totalInternships} color="amber" sub={`${stats?.activeInternships} active`} />
         <StatCard icon={FileText} label="Applications" value={stats?.totalApplications} color="green" sub={`${stats?.selectionRate}% selection rate`} />
       </div>
+
+      {/* Pending Verifications Alert */}
+      {pendingVerifications > 0 && (
+        <Link to="/admin/verifications"
+          className="flex items-center justify-between gap-4 p-4 mb-6 rounded-xl border border-amber-500/30 bg-amber-500/8 hover:bg-amber-500/12 transition-colors group">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle size={20} className="text-amber-400" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-amber-300">
+                {pendingVerifications} Registration{pendingVerifications > 1 ? 's' : ''} Awaiting Verification
+              </p>
+              <p className="text-xs text-amber-400/60">
+                New user{pendingVerifications > 1 ? 's have' : ' has'} submitted documents for review. Click to review.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/15 text-amber-400 text-xs font-medium group-hover:bg-amber-500/25 transition-colors flex-shrink-0">
+            <ShieldCheck size={14} /> Review Now
+          </div>
+        </Link>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 glass-card p-6 h-[400px]">

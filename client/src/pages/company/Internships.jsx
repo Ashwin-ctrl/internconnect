@@ -24,6 +24,12 @@ const CompanyInternships = () => {
   };
 
   const handleSave = async () => {
+    // Client-side validation
+    if (!form.title.trim()) { toast.error('Title is required.'); return; }
+    if (!form.description.trim()) { toast.error('Description is required.'); return; }
+    if (!form.duration.trim()) { toast.error('Duration is required.'); return; }
+    if (!form.deadline) { toast.error('Deadline is required.'); return; }
+
     setSaving(true);
     try {
       if (editing) { await api.put(`/internships/${editing}`, form); toast.success('Updated!'); }

@@ -48,18 +48,38 @@ const getInternship = async (req, res) => {
 const createInternship = async (req, res) => {
   try {
     const { title, description, skillsRequired, stipend, duration, deadline, domain, location, openings } = req.body;
+
+    // Explicit validation for required fields
+    if (!title || !title.trim()) return res.status(400).json({ success: false, message: 'Title is required.' });
+    if (!description || !description.trim()) return res.status(400).json({ success: false, message: 'Description is required.' });
+    if (!duration || !duration.trim()) return res.status(400).json({ success: false, message: 'Duration is required.' });
+    if (!deadline) return res.status(400).json({ success: false, message: 'Deadline is required.' });
+
+    // Safe parse for skillsRequired
+    let parsedSkills = [];
+    if (Array.isArray(skillsRequired)) {
+      parsedSkills = skillsRequired;
+    } else if (skillsRequired && skillsRequired.trim()) {
+      parsedSkills = skillsRequired.split(',').map(s => s.trim()).filter(Boolean);
+    }
+
     const internship = await Internship.create({
-      title, description,
-      skillsRequired: Array.isArray(skillsRequired) ? skillsRequired : skillsRequired.split(',').map(s => s.trim()),
+      title: title.trim(),
+      description: description.trim(),
+      skillsRequired: parsedSkills,
       stipend: Number(stipend) || 0,
-      duration, deadline, domain, location, openings: Number(openings) || 1,
+      duration: duration.trim(),
+      deadline,
+      domain: domain || '',
+      location: location || 'Remote',
+      openings: Number(openings) || 1,
       companyId: req.user._id,
       status: 'pending',
       isApprovedByAdmin: false,
     });
     res.status(201).json({ success: true, internship });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
@@ -69,15 +89,30 @@ const updateInternship = async (req, res) => {
     const internship = await Internship.findOne({ _id: req.params.id, companyId: req.user._id });
     if (!internship) return res.status(404).json({ success: false, message: 'Internship not found or unauthorized' });
 
-    const updates = req.body;
-    if (updates.skillsRequired && !Array.isArray(updates.skillsRequired)) {
-      updates.skillsRequired = updates.skillsRequired.split(',').map(s => s.trim());
+    const updates = { ...req.body };
+
+    // Explicit validation for required fields if they are being updated
+    if ('title' in updates && (!updates.title || !updates.title.trim())) return res.status(400).json({ success: false, message: 'Title is required.' });
+    if ('description' in updates && (!updates.description || !updates.description.trim())) return res.status(400).json({ success: false, message: 'Description is required.' });
+    if ('duration' in updates && (!updates.duration || !updates.duration.trim())) return res.status(400).json({ success: false, message: 'Duration is required.' });
+    if ('deadline' in updates && !updates.deadline) return res.status(400).json({ success: false, message: 'Deadline is required.' });
+
+    // Safe parse for skillsRequired
+    if ('skillsRequired' in updates) {
+      if (Array.isArray(updates.skillsRequired)) {
+        // already an array, keep as-is
+      } else if (updates.skillsRequired && updates.skillsRequired.trim()) {
+        updates.skillsRequired = updates.skillsRequired.split(',').map(s => s.trim()).filter(Boolean);
+      } else {
+        updates.skillsRequired = [];
+      }
     }
+
     Object.assign(internship, updates);
     await internship.save();
     res.json({ success: true, internship });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 

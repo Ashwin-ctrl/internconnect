@@ -19,12 +19,13 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isLoginReq = error.config && error.config.url && error.config.url.includes('/auth/login');
-    if (error.response?.status === 401 && !isLoginReq) {
+    const url = error.config?.url || '';
+    const isPublicAuthReq = url.includes('/auth/login') || url.includes('/auth/resubmit') || url.includes('/auth/verification-status');
+    if (error.response?.status === 401 && !isPublicAuthReq) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      
-      const publicPaths = ['/login', '/register', '/'];
+
+      const publicPaths = ['/login', '/register', '/resubmit-documents', '/'];
       if (!publicPaths.includes(window.location.pathname) && !window.location.pathname.startsWith('/verify/')) {
         window.location.href = '/login';
       }

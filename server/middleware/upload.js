@@ -34,8 +34,16 @@ const uploadResume = multer({
 
 const uploadAssignment = multer({
   storage: createStorage('assignments'),
-  limits: { fileSize: 20 * 1024 * 1024 },
-  fileFilter: fileFilter(['.pdf', '.zip', '.rar', '.js', '.py', '.txt', '.docx', '.png', '.jpg']),
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
+  fileFilter: fileFilter([
+    '.pdf', '.doc', '.docx', '.txt', '.md',
+    '.zip', '.rar', '.tar', '.gz',
+    '.js', '.ts', '.jsx', '.tsx', '.py', '.java', '.cpp', '.c', '.html', '.css',
+    '.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg',
+    '.mp4', '.mov', '.webm',
+    '.xlsx', '.xls', '.csv', '.pptx',
+    '.ipynb',
+  ]),
 });
 
 const uploadAvatar = multer({

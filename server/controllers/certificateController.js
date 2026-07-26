@@ -17,15 +17,22 @@ const generate = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Internship must be marked as Completed first' });
     }
 
-    
     const companyId = application.internshipId.companyId._id;
     if (companyId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
-    
+    // Already generated? Update scores if provided
     const existing = await Certificate.findOne({ applicationId: application._id });
-    if (existing) return res.json({ success: true, certificate: existing, message: 'Certificate already generated' });
+    if (existing) {
+      if (req.body.performanceScores) {
+        existing.performanceScores = req.body.performanceScores;
+        existing.overallRating = req.body.overallRating;
+        existing.companyRemarks = req.body.companyRemarks || '';
+        await existing.save();
+      }
+      return res.json({ success: true, certificate: existing, message: 'Certificate already generated' });
+    }
 
     const certificateId = uuidv4();
     const verificationUrl = `${process.env.CLIENT_URL}/verify/${certificateId}`;
@@ -55,6 +62,9 @@ const generate = async (req, res) => {
       certificateId,
       verificationUrl,
       filePath: `/uploads/certificates/${certificateId}.pdf`,
+      performanceScores: req.body.performanceScores || undefined,
+      overallRating: req.body.overallRating || undefined,
+      companyRemarks: req.body.companyRemarks || '',
     });
 
     res.status(201).json({ success: true, certificate });
@@ -63,6 +73,7 @@ const generate = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 
 const download = async (req, res) => {

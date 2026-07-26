@@ -20,6 +20,8 @@ import StudentApplications from './pages/student/Applications';
 import StudentAssignments from './pages/student/Assignments';
 import StudentDiscussions from './pages/student/Discussions';
 import StudentCertificates from './pages/student/Certificates';
+import StudentSkillGap from './pages/student/SkillGap';
+import StudentTimeline from './pages/student/CareerTimeline';
 
 
 import CompanyDashboard from './pages/company/Dashboard';
@@ -67,6 +69,8 @@ const App = () => {
         <Route path="/student/assignments" element={<ProtectedRoute roles={['student']}><StudentAssignments /></ProtectedRoute>} />
         <Route path="/student/discussions" element={<ProtectedRoute roles={['student']}><StudentDiscussions /></ProtectedRoute>} />
         <Route path="/student/certificates" element={<ProtectedRoute roles={['student']}><StudentCertificates /></ProtectedRoute>} />
+        <Route path="/student/skill-gap" element={<ProtectedRoute roles={['student']}><StudentSkillGap /></ProtectedRoute>} />
+        <Route path="/student/timeline" element={<ProtectedRoute roles={['student']}><StudentTimeline /></ProtectedRoute>} />
 
         {}
         <Route path="/company/dashboard" element={<ProtectedRoute roles={['company']}><CompanyDashboard /></ProtectedRoute>} />

@@ -6,15 +6,17 @@ import api from '../../utils/api';
 import {
   LayoutDashboard, User, Search, FileText, ClipboardList,
   MessageSquare, Award, Building2, Users, Settings,
-  ChevronRight, LogOut, Bell, ShieldCheck,
+  ChevronRight, LogOut, Bell, ShieldCheck, Target, CalendarDays,
 } from 'lucide-react';
 
 const studentNav = [
   { to: '/student/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/student/profile', icon: User, label: 'My Profile' },
   { to: '/student/internships', icon: Search, label: 'Find Internships' },
+  { to: '/student/skill-gap', icon: Target, label: 'Skill Gap' },
   { to: '/student/applications', icon: FileText, label: 'Applications' },
-  { to: '/student/assignments', icon: ClipboardList, label: 'Assignments' },
+  { to: '/student/assignments', icon: ClipboardList, label: 'Assignments', badgeKey: 'assignments' },
+  { to: '/student/timeline', icon: CalendarDays, label: 'My Journey' },
   { to: '/student/discussions', icon: MessageSquare, label: 'Discussions' },
   { to: '/student/certificates', icon: Award, label: 'Certificates' },
 ];
@@ -42,12 +44,24 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [pendingCount, setPendingCount] = useState(0);
+  const [assignmentBadge, setAssignmentBadge] = useState(0);
 
   // Fetch pending verification count for admin
   useEffect(() => {
     if (user?.role === 'admin') {
       api.get('/admin/verifications?status=pending')
         .then(r => setPendingCount(r.data.pendingCount || 0))
+        .catch(() => {});
+    }
+    // Fetch pending (not yet submitted) assignments for students
+    if (user?.role === 'student') {
+      api.get('/assignments/student')
+        .then(r => {
+          const pending = (r.data.assignments || []).filter(
+            a => !a.submission && new Date(a.deadline) >= new Date()
+          ).length;
+          setAssignmentBadge(pending);
+        })
         .catch(() => {});
     }
   }, [user, location.pathname]);
@@ -94,20 +108,24 @@ const Sidebar = () => {
 
       {}
       <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ to, icon: Icon, label, badge }) => {
+        {navItems.map(({ to, icon: Icon, label, badge, badgeKey }) => {
           const active = location.pathname === to;
-          const showBadge = badge && pendingCount > 0;
+          const adminBadgeCount = badge && pendingCount > 0 ? pendingCount : 0;
+          const studentBadgeCount = badgeKey === 'assignments' ? assignmentBadge : 0;
+          const badgeCount = adminBadgeCount || studentBadgeCount;
           return (
             <Link key={to} to={to}
               className={active ? 'sidebar-item-active' : 'sidebar-item'}>
               <Icon size={18} className={active ? 'text-primary-400' : ''} />
               <span className="text-sm flex-1">{label}</span>
-              {showBadge && (
-                <span className="ml-auto min-w-[20px] h-5 px-1 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center font-bold animate-pulse">
-                  {pendingCount > 9 ? '9+' : pendingCount}
+              {badgeCount > 0 && (
+                <span className={`ml-auto min-w-[20px] h-5 px-1.5 rounded-full text-white text-[10px] flex items-center justify-center font-bold animate-pulse ${
+                  badgeKey === 'assignments' ? 'bg-primary-600' : 'bg-amber-500'
+                }`}>
+                  {badgeCount > 9 ? '9+' : badgeCount}
                 </span>
               )}
-              {active && !showBadge && <ChevronRight size={14} className="ml-auto text-primary-400" />}
+              {active && !badgeCount && <ChevronRight size={14} className="ml-auto text-primary-400" />}
             </Link>
           );
         })}

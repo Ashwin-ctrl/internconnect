@@ -19,6 +19,7 @@ const CompanyAssignments = () => {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [submissions, setSubmissions] = useState({});
   const [viewingSub, setViewingSub] = useState(null);
+  const [viewingAssignmentId, setViewingAssignmentId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [reviewForm, setReviewForm] = useState({ score: '', feedback: '' });
   const [reviewing, setReviewing] = useState(false);
@@ -72,8 +73,9 @@ const CompanyAssignments = () => {
     } catch (err) { console.error(err); }
   };
 
-  const openReview = (sub) => {
+  const openReview = (sub, assignmentId) => {
     setViewingSub(sub);
+    setViewingAssignmentId(assignmentId);
     setReviewForm({ score: sub.score ?? '', feedback: sub.feedback ?? '' });
   };
 
@@ -84,9 +86,11 @@ const CompanyAssignments = () => {
         status, feedback: reviewForm.feedback, score: reviewForm.score,
       });
       toast.success(`Marked as ${status}`);
+      const asgId = viewingAssignmentId;
       setViewingSub(null);
-      // Refresh the submissions for that assignment
-      await fetchSubmissions(viewingSub.assignmentId);
+      setViewingAssignmentId(null);
+      // Refresh the submissions for the parent assignment
+      if (asgId) await fetchSubmissions(asgId);
     } catch { toast.error('Failed to review'); }
     setReviewing(false);
   };
@@ -317,7 +321,7 @@ const CompanyAssignments = () => {
                               </div>
                               <div className="flex items-center gap-2">
                                 <StatusBadge status={sub.status} />
-                                <button onClick={() => openReview(sub)}
+                                <button onClick={() => openReview(sub, a._id)}
                                   className="text-xs px-3 py-1 rounded-lg text-primary-400 hover:text-primary-300 transition-colors"
                                   style={{ background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)' }}>
                                   <Eye size={12} className="inline mr-1" /> Review

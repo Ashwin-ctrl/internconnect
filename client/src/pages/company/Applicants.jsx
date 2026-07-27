@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+
 // Fit score computation (mirror of student side)
 const computeFit = (studentSkills = [], requiredSkills = []) => {
   if (!requiredSkills.length) return 100;
@@ -275,7 +277,7 @@ const Applicants = () => {
                         })}
 
                         {app.studentId?.resume && (
-                          <a href={`http://localhost:5000${app.studentId.resume}`} target="_blank" rel="noreferrer"
+                          <a href={`${BASE_URL}${app.studentId.resume}`} target="_blank" rel="noreferrer"
                             className="ml-auto flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors">
                             <FileText size={12} /> Resume <ExternalLink size={10} />
                           </a>

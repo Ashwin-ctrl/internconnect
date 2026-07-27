@@ -21,8 +21,15 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve uploaded files with explicit CORS headers so browsers can open them
+// cross-origin (e.g. frontend at :5173 fetching files from :5000)
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_URL || 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 
 app.use('/api/auth', require('./routes/auth'));

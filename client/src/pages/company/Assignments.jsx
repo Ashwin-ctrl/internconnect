@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import StatusBadge from '../../components/shared/StatusBadge';
 import api from '../../utils/api';
+
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
 import {
   Plus, X, FileText, CheckCircle, Users, ClipboardList,
   Clock, ExternalLink, ChevronDown, ChevronUp, Info,
@@ -355,7 +357,7 @@ const CompanyAssignments = () => {
                             {sub.files?.length > 0 && (
                               <div className="flex flex-wrap gap-2 mt-2">
                                 {sub.files.map((f, i) => (
-                                  <a key={i} href={`http://localhost:5000${f.path}`} target="_blank" rel="noreferrer"
+                                  <a key={i} href={`${BASE_URL}${f.path}`} target="_blank" rel="noreferrer"
                                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-all hover:opacity-80"
                                     style={{ background: 'rgba(255,255,255,0.05)', color: '#d1d5db', border: '1px solid rgba(255,255,255,0.08)' }}>
                                     <span>{getMimeIcon(f.mimetype)}</span> {f.originalname}
@@ -446,7 +448,7 @@ const CompanyAssignments = () => {
                 <p className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Submitted Files</p>
                 <div className="space-y-2">
                   {viewingSub.files.map((f, i) => (
-                    <a key={i} href={`http://localhost:5000${f.path}`} target="_blank" rel="noreferrer"
+                    <a key={i} href={`${BASE_URL}${f.path}`} target="_blank" rel="noreferrer"
                       className="flex items-center gap-2 p-3 rounded-xl text-sm transition-all hover:opacity-80"
                       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#d1d5db' }}>
                       <span className="text-base">{getMimeIcon(f.mimetype)}</span>

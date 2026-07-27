@@ -6,6 +6,8 @@ import { fetchMe } from '../../features/auth/authSlice';
 import { Save, Upload, Plus, X, User, Zap, Shield, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+
 const Profile = () => {
   const { user } = useSelector(s => s.auth);
   const dispatch = useDispatch();
@@ -76,7 +78,7 @@ const Profile = () => {
           <div className="glass-card p-6 text-center">
             <div className="relative w-24 h-24 mx-auto mb-4">
               {user?.profileImage ? (
-                <img src={`http://localhost:5000${user.profileImage}`} className="w-24 h-24 rounded-full object-cover border-2 border-primary-500/30" alt="" />
+                <img src={`${BASE_URL}${user.profileImage}`} className="w-24 h-24 rounded-full object-cover border-2 border-primary-500/30" alt="" />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-600 to-violet-500 flex items-center justify-center text-3xl font-bold text-white">
                   {user?.name?.[0]?.toUpperCase()}
@@ -97,7 +99,7 @@ const Profile = () => {
             {user?.resume ? (
               <div className="flex items-center gap-2 text-sm text-emerald-400 mb-3">
                 <span>✓ Resume uploaded</span>
-                <a href={`http://localhost:5000${user.resume}`} target="_blank" className="text-primary-400 text-xs hover:underline">View</a>
+                <a href={`${BASE_URL}${user.resume}`} target="_blank" rel="noreferrer" className="text-primary-400 text-xs hover:underline">View</a>
               </div>
             ) : <p className="text-sm text-gray-500 mb-3">No resume uploaded</p>}
             <label className="btn-secondary text-sm cursor-pointer flex items-center justify-center gap-2">

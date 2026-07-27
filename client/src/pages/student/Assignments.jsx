@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import StatusBadge from '../../components/shared/StatusBadge';
 import api from '../../utils/api';
+
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
 import {
   Upload, ClipboardList, Clock, FileText, Loader2, Plus, X,
   Link2, ExternalLink, CheckCircle2, AlertCircle, Star, Building2,
@@ -258,7 +260,7 @@ const StudentAssignments = () => {
                   {sub?.files?.length > 0 && !isSubmitOpen && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {sub.files.map((f, i) => (
-                        <a key={i} href={`http://localhost:5000${f.path}`} target="_blank" rel="noreferrer"
+                        <a key={i} href={`${BASE_URL}${f.path}`} target="_blank" rel="noreferrer"
                           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-all hover:opacity-80"
                           style={{ background: 'rgba(255,255,255,0.05)', color: '#d1d5db', border: '1px solid rgba(255,255,255,0.08)' }}>
                           <span>{getMimeIcon(f.mimetype, f.originalname)}</span> {f.originalname}

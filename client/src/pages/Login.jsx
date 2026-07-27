@@ -40,26 +40,24 @@ const Login = () => {
   ];
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'linear-gradient(135deg, #0a0a0f 0%, #0f0c29 60%, #1a1040 100%)' }}>
+    <div className="min-h-screen flex" style={{ background: '#0d0d0d' }}>
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: '#111111', borderRight: '1px solid #1f1f1f' }}>
         <div className="absolute inset-0 flex flex-col items-center justify-center p-16 text-center">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-primary-600/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 bg-violet-600/20 rounded-full blur-3xl" />
           <div className="relative z-10">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-600 to-violet-600 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary-900/50 animate-glow">
-              <span className="text-white font-black text-3xl">IC</span>
+            <div className="w-16 h-16 rounded-xl bg-violet-700 flex items-center justify-center mx-auto mb-6">
+              <span className="text-white font-bold text-2xl">IC</span>
             </div>
-            <h1 className="text-5xl font-black text-white mb-4 leading-tight">
-              Intern<span className="gradient-text">Connect</span>
+            <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+              InternConnect
             </h1>
-            <p className="text-gray-400 text-lg leading-relaxed max-w-md">
-              The centralized platform connecting students with opportunities, companies with talent, and dreams with reality.
+            <p className="text-gray-400 leading-relaxed max-w-md">
+              The platform connecting students with opportunities, companies with talent, and helping you build a verified career portfolio.
             </p>
-            <div className="grid grid-cols-3 gap-4 mt-12">
+            <div className="grid grid-cols-3 gap-4 mt-10">
               {[['500+', 'Students'], ['100+', 'Companies'], ['1K+', 'Internships']].map(([num, label]) => (
                 <div key={label} className="glass-card p-4 text-center">
-                  <div className="text-2xl font-bold gradient-text">{num}</div>
+                  <div className="text-xl font-bold text-white">{num}</div>
                   <div className="text-xs text-gray-500 mt-1">{label}</div>
                 </div>
               ))}

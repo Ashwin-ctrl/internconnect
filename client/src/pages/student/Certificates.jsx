@@ -5,8 +5,7 @@ import {
   Award, Download, ExternalLink, BarChart2, ChevronDown, ChevronUp,
   Loader2, Star, CheckCircle2,
 } from 'lucide-react';
-
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+import toast from 'react-hot-toast';
 
 // Mini performance bar
 const PerfBar = ({ label, value }) => {
@@ -36,18 +35,36 @@ const Certificates = () => {
       .catch(() => setLoading(false));
   }, []);
 
-  const handleDownload = (filePath, name) => {
-    // Use the static /uploads URL directly — same pattern as resume/assignment
-    // downloads. The /uploads route has CORS headers so this works cross-origin.
-    const url = `${BASE_URL}${filePath}`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `InternConnect_Certificate_${name}.pdf`;
-    a.target = '_blank';
-    a.rel = 'noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const [downloading, setDownloading] = useState(null);
+
+  const handleDownload = async (id, name) => {
+    setDownloading(id);
+    try {
+      // Use the authenticated API endpoint — it auto-regenerates the PDF
+      // if the file is missing on disk (e.g. after server restart).
+      const res = await api.get(`/certificates/${id}/download`, { responseType: 'blob' });
+
+      // Check if the response is actually an error JSON blob
+      const contentType = res.headers['content-type'] || '';
+      if (contentType.includes('application/json')) {
+        const text = await res.data.text();
+        const json = JSON.parse(text);
+        throw new Error(json.message || 'Download failed');
+      }
+
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `InternConnect_Certificate_${name}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('Certificate downloaded!');
+    } catch (err) {
+      toast.error(err.message || 'Download failed. Please try again.');
+    }
+    setDownloading(null);
   };
 
   const PERF_LABELS = {
@@ -156,9 +173,13 @@ const Certificates = () => {
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
                     <button
-                      onClick={() => handleDownload(cert.filePath, cert.studentName)}
+                      onClick={() => handleDownload(cert._id, cert.studentName)}
+                      disabled={downloading === cert._id}
                       className="btn-primary flex-1 text-sm flex items-center justify-center gap-2 py-2.5">
-                      <Download size={14} /> Download PDF
+                      {downloading === cert._id
+                        ? <Loader2 size={14} className="animate-spin" />
+                        : <Download size={14} />}
+                      {downloading === cert._id ? 'Downloading...' : 'Download PDF'}
                     </button>
                     <a href={`/verify/${cert.certificateId}`} target="_blank" rel="noreferrer"
                       className="btn-secondary text-sm flex items-center justify-center gap-2 px-4 py-2.5">

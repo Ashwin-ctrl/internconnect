@@ -86,10 +86,28 @@ const download = async (req, res) => {
     }
 
     const filePath = path.join(__dirname, '..', certificate.filePath);
-    if (!fs.existsSync(filePath)) return res.status(404).json({ success: false, message: 'Certificate file not found' });
+
+    // If PDF file is missing on disk (e.g. after server restart / folder wipe),
+    // regenerate it on-the-fly from the data stored in the DB record.
+    if (!fs.existsSync(filePath)) {
+      console.log(`[Certificate] File missing, regenerating: ${certificate.certificateId}`);
+      const certDir = path.dirname(filePath);
+      if (!fs.existsSync(certDir)) fs.mkdirSync(certDir, { recursive: true });
+
+      await generateCertificate({
+        studentName: certificate.studentName,
+        companyName: certificate.companyName,
+        internshipTitle: certificate.internshipTitle,
+        duration: certificate.duration,
+        certificateId: certificate.certificateId,
+        verificationUrl: certificate.verificationUrl,
+        outputPath: filePath,
+      });
+    }
 
     res.download(filePath, `InternConnect_Certificate_${certificate.studentName}.pdf`);
   } catch (error) {
+    console.error('[Certificate download]', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

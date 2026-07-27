@@ -6,6 +6,8 @@ import {
   Loader2, Star, CheckCircle2,
 } from 'lucide-react';
 
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+
 // Mini performance bar
 const PerfBar = ({ label, value }) => {
   const color = value >= 80 ? '#10b981' : value >= 60 ? '#f59e0b' : '#7c3aed';
@@ -34,18 +36,18 @@ const Certificates = () => {
       .catch(() => setLoading(false));
   }, []);
 
-  const handleDownload = async (id, name) => {
-    try {
-      const res = await api.get(`/certificates/${id}/download`, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `InternConnect_Certificate_${name}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
-    }
+  const handleDownload = (filePath, name) => {
+    // Use the static /uploads URL directly — same pattern as resume/assignment
+    // downloads. The /uploads route has CORS headers so this works cross-origin.
+    const url = `${BASE_URL}${filePath}`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `InternConnect_Certificate_${name}.pdf`;
+    a.target = '_blank';
+    a.rel = 'noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const PERF_LABELS = {
@@ -154,7 +156,7 @@ const Certificates = () => {
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
                     <button
-                      onClick={() => handleDownload(cert._id, cert.studentName)}
+                      onClick={() => handleDownload(cert.filePath, cert.studentName)}
                       className="btn-primary flex-1 text-sm flex items-center justify-center gap-2 py-2.5">
                       <Download size={14} /> Download PDF
                     </button>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, clearError, clearLoginVerification } from '../features/auth/authSlice';
@@ -12,8 +12,11 @@ const Login = () => {
   const navigate = useNavigate();
   const { loading, error, user, loginVerificationStatus, loginVerificationNote } = useSelector(s => s.auth);
 
+  // Track whether a login was just submitted — only redirect on a fresh login, not on stale localStorage
+  const justSubmitted = useRef(false);
+
   useEffect(() => {
-    if (user) {
+    if (user && justSubmitted.current) {
       const paths = { student: '/student/dashboard', company: '/company/dashboard', admin: '/admin/dashboard' };
       navigate(paths[user.role] || '/');
     }
@@ -29,6 +32,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    justSubmitted.current = true;
     dispatch(clearLoginVerification());
     dispatch(login(form));
   };

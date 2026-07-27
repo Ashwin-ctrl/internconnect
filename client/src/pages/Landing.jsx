@@ -103,7 +103,7 @@ const Landing = () => {
           </Link>
           <div className="flex items-center gap-3">
             <Link to="/login" className="btn-secondary text-sm px-5 py-2">Sign In</Link>
-            <Link to="/register" className="btn-primary text-sm px-5 py-2">Get Started</Link>
+            <Link to="/login" className="btn-primary text-sm px-5 py-2">Get Started</Link>
           </div>
         </div>
       </nav>
@@ -126,7 +126,7 @@ const Landing = () => {
           </p>
 
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link to="/register" className="btn-primary text-base px-8 py-3 flex items-center gap-2">
+            <Link to="/login" className="btn-primary text-base px-8 py-3 flex items-center gap-2">
               Start Your Career Journey <ArrowRight size={16} />
             </Link>
             <Link to="/login" className="btn-secondary text-base px-8 py-3">
@@ -286,7 +286,7 @@ const Landing = () => {
           <p className="text-gray-500 mb-7">
             Join InternConnect and start your journey from skill gaps to career wins.
           </p>
-          <Link to="/register" className="btn-primary text-base px-8 py-3 inline-flex items-center gap-2">
+          <Link to="/login" className="btn-primary text-base px-8 py-3 inline-flex items-center gap-2">
             Create Free Account <ArrowRight size={16} />
           </Link>
         </div>

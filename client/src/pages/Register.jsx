@@ -208,7 +208,7 @@ const Register = () => {
               <div className="relative">
                 <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input type="text" required value={form.name} onChange={e => set('name', e.target.value)}
-                  className="input-field pl-10" placeholder={role === 'student' ? 'John Doe' : 'Contact Person'} />
+                  className="input-field pl-11" placeholder={role === 'student' ? 'John Doe' : 'Contact Person'} />
               </div>
             </div>
 
@@ -219,7 +219,7 @@ const Register = () => {
                 <div className="relative">
                   <Building2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input type="text" required value={form.companyName} onChange={e => set('companyName', e.target.value)}
-                    className="input-field pl-10" placeholder="TechCorp Inc." />
+                    className="input-field pl-11" placeholder="TechCorp Inc." />
                 </div>
               </div>
             )}
@@ -231,7 +231,7 @@ const Register = () => {
                 <div className="relative">
                   <GraduationCap size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                   <input type="text" value={form.college} onChange={e => set('college', e.target.value)}
-                    className="input-field pl-10" placeholder="MIT, IIT Delhi..." />
+                    className="input-field pl-11" placeholder="MIT, IIT Delhi..." />
                 </div>
               </div>
             )}
@@ -242,7 +242,7 @@ const Register = () => {
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input type="email" required value={form.email} onChange={e => set('email', e.target.value)}
-                  className="input-field pl-10" placeholder="you@example.com" />
+                  className="input-field pl-11" placeholder="you@example.com" />
               </div>
             </div>
 
@@ -252,7 +252,7 @@ const Register = () => {
               <div className="relative">
                 <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input type="tel" value={form.phone} onChange={e => set('phone', e.target.value)}
-                  className="input-field pl-10" placeholder="+91 9876543210" />
+                  className="input-field pl-11" placeholder="+91 9876543210" />
               </div>
             </div>
 
@@ -263,7 +263,7 @@ const Register = () => {
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input type={showPass ? 'text' : 'password'} required value={form.password}
                   onChange={e => set('password', e.target.value)}
-                  className="input-field pl-10 pr-10" placeholder="Min 6 characters" />
+                  className="input-field pl-11 pr-10" placeholder="Min 6 characters" />
                 <button type="button" onClick={() => setShowPass(!showPass)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}

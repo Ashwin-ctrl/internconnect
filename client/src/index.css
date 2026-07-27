@@ -50,7 +50,7 @@
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: linear-gradient(135deg, #0a0a0f 0%, #0f0c1f 50%, #0a0a1a 100%);
+  background: #0d0d0d;
   min-height: 100vh;
   color: white;
   -webkit-font-smoothing: antialiased;

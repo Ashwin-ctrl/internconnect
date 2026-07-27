@@ -123,7 +123,7 @@ const Login = () => {
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input type="email" required value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
-                  className="input-field pl-11" placeholder="you@example.com" />
+                  className="input-field" style={{ paddingLeft: '2.75rem' }} placeholder="you@example.com" />
               </div>
             </div>
             <div>
@@ -132,7 +132,7 @@ const Login = () => {
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input type={showPass ? 'text' : 'password'} required value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
-                  className="input-field pl-11 pr-10" placeholder="••••••••" />
+                  className="input-field pr-10" style={{ paddingLeft: '2.75rem' }} placeholder="••••••••" />
                 <button type="button" onClick={() => setShowPass(!showPass)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}

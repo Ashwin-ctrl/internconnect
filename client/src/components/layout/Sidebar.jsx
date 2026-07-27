@@ -3,10 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logout } from '../../features/auth/authSlice';
 import { useState, useEffect } from 'react';
 import api from '../../utils/api';
+import { useTheme } from '../../context/ThemeContext';
 import {
   LayoutDashboard, User, Search, FileText, ClipboardList,
-  MessageSquare, Award, Building2, Users, Settings,
-  ChevronRight, LogOut, Bell, ShieldCheck, Target, CalendarDays,
+  MessageSquare, Award, Building2, Users,
+  ChevronRight, LogOut, ShieldCheck, Target, CalendarDays,
+  Sun, Moon,
 } from 'lucide-react';
 
 const studentNav = [
@@ -43,17 +45,18 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { theme, toggleTheme } = useTheme();
   const [pendingCount, setPendingCount] = useState(0);
   const [assignmentBadge, setAssignmentBadge] = useState(0);
 
-  // Fetch pending verification count for admin
+  const isLight = theme === 'light';
+
   useEffect(() => {
     if (user?.role === 'admin') {
       api.get('/admin/verifications?status=pending')
         .then(r => setPendingCount(r.data.pendingCount || 0))
         .catch(() => {});
     }
-    // Fetch pending (not yet submitted) assignments for students
     if (user?.role === 'student') {
       api.get('/assignments/student')
         .then(r => {
@@ -77,36 +80,45 @@ const Sidebar = () => {
     navigate('/login');
   };
 
+  const sidebarBg = isLight ? '#ffffff' : '#111118';
+  const sidebarBorder = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)';
+  const dividerColor = isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.05)';
+  const userCardBg = isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)';
+  const userCardBorder = isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.05)';
+  const userNameColor = isLight ? '#111111' : 'white';
+  const userEmailColor = isLight ? '#6b7280' : '#6b7280';
+
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 z-40 flex flex-col"
-      style={{ background: 'linear-gradient(180deg, #0f0c29 0%, #13102a 100%)', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-      {}
-      <div className="p-6 border-b border-white/5">
+    <aside className="fixed left-0 top-0 h-full w-64 z-40 flex flex-col transition-colors duration-200"
+      style={{ background: sidebarBg, borderRight: `1px solid ${sidebarBorder}` }}>
+
+      {/* Logo */}
+      <div className="p-6" style={{ borderBottom: `1px solid ${dividerColor}` }}>
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-600 to-violet-600 flex items-center justify-center shadow-lg shadow-primary-900/50">
+          <div className="w-9 h-9 rounded-xl bg-violet-700 flex items-center justify-center">
             <span className="text-white font-bold text-sm">IC</span>
           </div>
           <div>
-            <div className="font-bold text-white text-sm leading-none">InternConnect</div>
+            <div className="font-bold text-sm leading-none" style={{ color: userNameColor }}>InternConnect</div>
             <div className={`text-xs mt-0.5 ${roleColor[user?.role]}`}>{roleLabel[user?.role]}</div>
           </div>
         </Link>
       </div>
 
-      {}
-      <div className="p-4 mx-3 my-3 rounded-xl bg-white/5 border border-white/5">
+      {/* User card */}
+      <div className="p-4 mx-3 my-3 rounded-xl" style={{ background: userCardBg, border: `1px solid ${userCardBorder}` }}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-600 to-violet-500 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-violet-700 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
             {user?.name?.[0]?.toUpperCase()}
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
-            <div className="text-xs text-gray-500 truncate">{user?.email}</div>
+            <div className="text-sm font-semibold truncate" style={{ color: userNameColor }}>{user?.name}</div>
+            <div className="text-xs truncate" style={{ color: userEmailColor }}>{user?.email}</div>
           </div>
         </div>
       </div>
 
-      {}
+      {/* Nav */}
       <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-y-auto">
         {navItems.map(({ to, icon: Icon, label, badge, badgeKey }) => {
           const active = location.pathname === to;
@@ -131,8 +143,28 @@ const Sidebar = () => {
         })}
       </nav>
 
-      {}
-      <div className="px-3 py-4 border-t border-white/5 space-y-0.5">
+      {/* Bottom: Theme toggle + Logout */}
+      <div className="px-3 py-4 space-y-1" style={{ borderTop: `1px solid ${dividerColor}` }}>
+        {/* Theme toggle button */}
+        <button
+          onClick={toggleTheme}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm"
+          style={{
+            background: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.05)',
+            color: isLight ? '#374151' : '#9ca3af',
+          }}
+        >
+          {isLight ? <Moon size={18} /> : <Sun size={18} />}
+          <span>{isLight ? 'Dark Mode' : 'Light Mode'}</span>
+          {/* Toggle pill */}
+          <div className="ml-auto relative w-9 h-5 rounded-full transition-colors duration-200"
+            style={{ background: isLight ? '#7c3aed' : '#374151' }}>
+            <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all duration-200"
+              style={{ left: isLight ? '1.125rem' : '0.125rem' }} />
+          </div>
+        </button>
+
+        {/* Logout */}
         <button onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all duration-200 text-sm">
           <LogOut size={18} />
